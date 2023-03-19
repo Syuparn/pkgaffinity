@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/syuparn/pkgaffinity"
-	"golang.org/x/tools/go/analysis/unitchecker"
+	"golang.org/x/tools/go/analysis/singlechecker"
 )
 
-func main() { unitchecker.Main(pkgaffinity.Analyzer) }
+func main() { singlechecker.Main(pkgaffinity.Analyzer) }
