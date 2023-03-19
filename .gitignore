@@ -7,6 +7,8 @@
 
 # Test binary, built with `go test -c`
 *.test
+cmd/pkgaffinity/pkgaffinity
+cmd/pkgaffinity/pkgaffinity.exe
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
