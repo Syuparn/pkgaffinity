@@ -24,14 +24,14 @@ func run(pass *analysis.Pass) (any, error) {
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
-		(*ast.Ident)(nil),
+		(*ast.ImportSpec)(nil),
 	}
 
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
 		switch n := n.(type) {
-		case *ast.Ident:
-			if n.Name == "gopher" {
-				pass.Reportf(n.Pos(), "identifier is gopher")
+		case *ast.ImportSpec:
+			if n.Path.Value == `"fmt"` {
+				pass.Reportf(n.Pos(), "import is \"fmt\"")
 			}
 		}
 	})
