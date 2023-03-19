@@ -1,8 +1,11 @@
 package pkgaffinity
 
 import (
+	"fmt"
 	"go/ast"
+	"go/types"
 
+	"github.com/samber/lo"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
@@ -21,6 +24,11 @@ var Analyzer = &analysis.Analyzer{
 }
 
 func run(pass *analysis.Pass) (any, error) {
+
+	// TODO: use for linter
+	fmt.Println(pass.Pkg.Path())
+	fmt.Println(lo.Map(pass.Pkg.Imports(), func(p *types.Package, _ int) string { return p.Path() }))
+
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
 	nodeFilter := []ast.Node{
