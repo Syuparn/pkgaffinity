@@ -3,9 +3,11 @@ package pkgaffinity_test
 import (
 	"testing"
 
-	"github.com/gostaticanalysis/testutil"
-	"github.com/syuparn/pkgaffinity"
 	"golang.org/x/tools/go/analysis/analysistest"
+
+	"github.com/gostaticanalysis/testutil"
+
+	"github.com/syuparn/pkgaffinity"
 )
 
 // TestAnalyzer is a test for Analyzer.

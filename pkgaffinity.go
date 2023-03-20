@@ -5,10 +5,11 @@ import (
 	"go/ast"
 	"go/types"
 
-	"github.com/samber/lo"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 	"golang.org/x/tools/go/ast/inspector"
+
+	"github.com/samber/lo"
 )
 
 const doc = "pkgaffinity is ..."
