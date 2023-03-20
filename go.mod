@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/gostaticanalysis/testutil v0.4.0
+	github.com/matryer/moq v0.3.1
 	github.com/samber/lo v1.37.0
 	github.com/stretchr/testify v1.8.2
 	golang.org/x/tools v0.7.0
