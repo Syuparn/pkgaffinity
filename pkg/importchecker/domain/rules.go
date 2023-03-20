@@ -9,8 +9,17 @@ type Path string
 type Name string
 type PathPrefix string
 
+type AntiAffinityRuleName string
+
+// Violation represents why affinity rule is not fulfilled.
+type Violation struct {
+	ImportPath  Path
+	PackagePath Path
+	RuleName    AntiAffinityRuleName
+}
+
 type AntiAffinityRule interface {
-	Check(Path) error
+	Check(Path) *Violation
 }
 
 // AntiAffinityGroupRule defines import path anti-affinity group of a package.
@@ -54,7 +63,7 @@ func NewAntiAffinityGroupRule(self Path, group PathPrefix) (*AntiAffinityGroupRu
 	}, nil
 }
 
-func (r *AntiAffinityGroupRule) Check(path Path) error {
+func (r *AntiAffinityGroupRule) Check(path Path) *Violation {
 	if !strings.HasPrefix(string(path), string(r.groupPathPrefix)+"/") {
 		return nil
 	}
@@ -67,7 +76,15 @@ func (r *AntiAffinityGroupRule) Check(path Path) error {
 		}
 	}
 
-	return fmt.Errorf("import `%s` in package `%s` breaks anti-affinity group rule `%s`", path, r.selfPath, r.groupPathPrefix)
+	return &Violation{
+		ImportPath:  path,
+		PackagePath: r.selfPath,
+		RuleName:    r.name(),
+	}
+}
+
+func (r *AntiAffinityGroupRule) name() AntiAffinityRuleName {
+	return AntiAffinityRuleName(fmt.Sprintf("anti-affinity group rule `%s`", r.groupPathPrefix))
 }
 
 // TODO: make AntiAffinityListRule

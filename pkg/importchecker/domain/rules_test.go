@@ -81,7 +81,7 @@ func TestNewAntiAffinityGroupRuleError(t *testing.T) {
 	}
 }
 
-func TestAntiAffinityGroupRuleCheck(t *testing.T) {
+func TestAntiAffinityGroupRuleCheckOK(t *testing.T) {
 	tests := []struct {
 		name string
 		rule *AntiAffinityGroupRule
@@ -115,18 +115,18 @@ func TestAntiAffinityGroupRuleCheck(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.rule.Check(tt.path)
-			assert.NoError(t, err)
+			violation := tt.rule.Check(tt.path)
+			assert.Nil(t, violation)
 		})
 	}
 }
 
-func TestAntiAffinityGroupRuleCheckError(t *testing.T) {
+func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 	tests := []struct {
 		name     string
 		rule     *AntiAffinityGroupRule
 		path     Path
-		expected string
+		expected *Violation
 	}{
 		{
 			name: "path is in groupPathPrefix but not in selfPathPrefix",
@@ -134,8 +134,12 @@ func TestAntiAffinityGroupRuleCheckError(t *testing.T) {
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
 			)),
-			path:     "foo/bar/hoge/piyo",
-			expected: "import `foo/bar/hoge/piyo` in package `foo/bar/baz/quux` breaks anti-affinity group rule `foo/bar`",
+			path: "foo/bar/hoge/piyo",
+			expected: &Violation{
+				ImportPath:  "foo/bar/hoge/piyo",
+				PackagePath: "foo/bar/baz/quux",
+				RuleName:    "anti-affinity group rule `foo/bar`",
+			},
 		},
 		{
 			name: "path is in groupPathPrefix but not in selfPathPrefix (path is in the same hierarchy as selfPathPrefix)",
@@ -143,8 +147,12 @@ func TestAntiAffinityGroupRuleCheckError(t *testing.T) {
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
 			)),
-			path:     "foo/bar/hoge",
-			expected: "import `foo/bar/hoge` in package `foo/bar/baz/quux` breaks anti-affinity group rule `foo/bar`",
+			path: "foo/bar/hoge",
+			expected: &Violation{
+				ImportPath:  "foo/bar/hoge",
+				PackagePath: "foo/bar/baz/quux",
+				RuleName:    "anti-affinity group rule `foo/bar`",
+			},
 		},
 		{
 			name: "path has prefix selfPathPrefix literally but not in selfPathPrefix",
@@ -152,16 +160,20 @@ func TestAntiAffinityGroupRuleCheckError(t *testing.T) {
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
 			)),
-			path:     "foo/bar/baz123",
-			expected: "import `foo/bar/baz123` in package `foo/bar/baz/quux` breaks anti-affinity group rule `foo/bar`",
+			path: "foo/bar/baz123",
+			expected: &Violation{
+				ImportPath:  "foo/bar/baz123",
+				PackagePath: "foo/bar/baz/quux",
+				RuleName:    "anti-affinity group rule `foo/bar`",
+			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.rule.Check(tt.path)
-			assert.Error(t, err)
-			assert.EqualError(t, err, tt.expected)
+			violation := tt.rule.Check(tt.path)
+			assert.NotNil(t, violation)
+			assert.Equal(t, violation, tt.expected)
 		})
 	}
 }
