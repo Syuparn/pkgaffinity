@@ -1,4 +1,9 @@
 # pkgaffinity
+
+[![Test](https://github.com/Syuparn/pkgaffinity/actions/workflows/test.yml/badge.svg)](https://github.com/Syuparn/pkgaffinity/actions/workflows/test.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/syuparn/pkgaffinity)](https://goreportcard.com/report/github.com/syuparn/pkgaffinity)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+
 linter for Go source code that checks whether imports break encapsulation
 
 # Usage
