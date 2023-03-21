@@ -22,7 +22,7 @@ type CheckImportsInputPort interface {
 
 //go:generate go run github.com/matryer/moq -fmt goimports -out zz_generated_moq_check_imports.go . CheckImportsOutputPort
 type CheckImportsOutputPort interface {
-	Present(*CheckImportsOutputData)
+	Present(*CheckImportsOutputData) error
 }
 
 type checkImportsInteractor struct {
@@ -56,7 +56,5 @@ func (it *checkImportsInteractor) Exec(in *CheckImportsInputData) error {
 		}))
 	})
 
-	it.out.Present(&CheckImportsOutputData{Violations: violations})
-
-	return nil
+	return it.out.Present(&CheckImportsOutputData{Violations: violations})
 }

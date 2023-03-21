@@ -17,7 +17,7 @@ var _ CheckImportsOutputPort = &CheckImportsOutputPortMock{}
 //
 //		// make and configure a mocked CheckImportsOutputPort
 //		mockedCheckImportsOutputPort := &CheckImportsOutputPortMock{
-//			PresentFunc: func(checkImportsOutputData *CheckImportsOutputData)  {
+//			PresentFunc: func(checkImportsOutputData *CheckImportsOutputData) error {
 //				panic("mock out the Present method")
 //			},
 //		}
@@ -28,7 +28,7 @@ var _ CheckImportsOutputPort = &CheckImportsOutputPortMock{}
 //	}
 type CheckImportsOutputPortMock struct {
 	// PresentFunc mocks the Present method.
-	PresentFunc func(checkImportsOutputData *CheckImportsOutputData)
+	PresentFunc func(checkImportsOutputData *CheckImportsOutputData) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -42,7 +42,7 @@ type CheckImportsOutputPortMock struct {
 }
 
 // Present calls PresentFunc.
-func (mock *CheckImportsOutputPortMock) Present(checkImportsOutputData *CheckImportsOutputData) {
+func (mock *CheckImportsOutputPortMock) Present(checkImportsOutputData *CheckImportsOutputData) error {
 	if mock.PresentFunc == nil {
 		panic("CheckImportsOutputPortMock.PresentFunc: method is nil but CheckImportsOutputPort.Present was just called")
 	}
@@ -54,7 +54,7 @@ func (mock *CheckImportsOutputPortMock) Present(checkImportsOutputData *CheckImp
 	mock.lockPresent.Lock()
 	mock.calls.Present = append(mock.calls.Present, callInfo)
 	mock.lockPresent.Unlock()
-	mock.PresentFunc(checkImportsOutputData)
+	return mock.PresentFunc(checkImportsOutputData)
 }
 
 // PresentCalls gets all the calls that were made to Present.

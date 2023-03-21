@@ -10,7 +10,7 @@ import (
 	"github.com/syuparn/pkgaffinity/pkg/importchecker/usecase"
 )
 
-func TestCheckImportsPresenter(t *testing.T) {
+func TestCheckImportsPresenterViolation(t *testing.T) {
 	tests := []struct {
 		name     string
 		out      *usecase.CheckImportsOutputData
@@ -44,9 +44,39 @@ func TestCheckImportsPresenter(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var w bytes.Buffer
 			presenter := NewCheckImportsOutputPort(&w)
-			presenter.Present(tt.out)
+			err := presenter.Present(tt.out)
 
 			assert.Equal(t, strings.Join(tt.expected, "\n"), w.String())
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestCheckImportsPresenter(t *testing.T) {
+	tests := []struct {
+		name     string
+		out      *usecase.CheckImportsOutputData
+		expected []string
+	}{
+		{
+			name: "no violations",
+			out: &usecase.CheckImportsOutputData{
+				Violations: []*domain.Violation{},
+			},
+			expected: []string{
+				"", // break line
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var w bytes.Buffer
+			presenter := NewCheckImportsOutputPort(&w)
+			err := presenter.Present(tt.out)
+
+			assert.Equal(t, strings.Join(tt.expected, "\n"), w.String())
+			assert.NoError(t, err)
 		})
 	}
 }

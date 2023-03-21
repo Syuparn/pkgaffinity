@@ -16,14 +16,21 @@ type checkImportsPresenter struct {
 // impl check
 var _ usecase.CheckImportsOutputPort = &checkImportsPresenter{}
 
-func NewCheckImportsOutputPort(writer io.Writer) usecase.CheckImportsOutputPort {
+func NewCheckImportsOutputPort(
+	writer io.Writer,
+) usecase.CheckImportsOutputPort {
 	return &checkImportsPresenter{
 		writer: writer,
 	}
 }
 
-func (p *checkImportsPresenter) Present(out *usecase.CheckImportsOutputData) {
+func (p *checkImportsPresenter) Present(out *usecase.CheckImportsOutputData) error {
 	lo.ForEach(out.Violations, func(v *domain.Violation, _ int) {
 		fmt.Fprintf(p.writer, "package %s: import \"%s\" breaks %s\n", v.PackagePath, v.ImportPath, v.RuleName)
 	})
+
+	if len(out.Violations) != 0 {
+		return fmt.Errorf("violations found")
+	}
+	return nil
 }

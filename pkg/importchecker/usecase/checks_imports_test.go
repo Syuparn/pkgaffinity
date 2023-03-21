@@ -73,8 +73,9 @@ func TestCheckImportsInputPortExec(t *testing.T) {
 			var actual *CheckImportsOutputData
 
 			presenterMock := &CheckImportsOutputPortMock{
-				PresentFunc: func(out *CheckImportsOutputData) {
+				PresentFunc: func(out *CheckImportsOutputData) error {
 					actual = out // capture
+					return nil
 				},
 			}
 			antiAffinityRuleRepositoryMock := &domain.AntiAffinityRuleRepositoryMock{

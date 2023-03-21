@@ -1,0 +1,13 @@
+# This file defines import rules used for pkgaffinity command.
+# File path can be changed by environment variable `PKGAFFINITY_CONFIG_PATH` (default: `.pkgaffinity.yaml`).
+
+version: v1alpha1
+# which packages are not allowed to import each other
+antiAffinityRules:
+  # Group rule defines anti-affinity rules that subpackages of group path prefix are not allowed to import each other.
+  # This protects encapsulation of each subpackages under group.
+  # ex:
+  #     NG: package github.com/syuparn/pkgaffinity/pkg/config/* imports github.com/syuparn/pkgaffinity/pkg/importchecker/*
+  #     OK: package github.com/syuparn/pkgaffinity/pkg/config/* imports github.com/syuparn/pkgaffinity/pkg/config/*
+  groups:
+    - pathPrefix: github.com/syuparn/pkgaffinity/pkg

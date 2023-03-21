@@ -42,7 +42,7 @@ func (r *analysisRunner) run(pass *analysis.Pass) (any, error) {
 
 	err := r.importChecker.CheckImports(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to check package: %+v: %w", req, err)
+		return nil, fmt.Errorf("check failed: %w", err)
 	}
 
 	return nil, nil
