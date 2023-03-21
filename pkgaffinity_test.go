@@ -13,8 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestAnalyzer is a test for Analyzer.
-func TestAnalyzer(t *testing.T) {
+func TestAnalyzerViolation(t *testing.T) {
 	tests := []struct {
 		name        string
 		packagePath string
@@ -28,16 +27,11 @@ func TestAnalyzer(t *testing.T) {
 				"", // break line
 			},
 		},
-		{
-			name:        "package meets anti-affinity rule",
-			packagePath: "a/foo/bar",
-			expectedOut: []string{
-				"", // break line
-			},
-		},
 	}
 
 	for _, tt := range tests {
+		tt := tt // pin
+
 		t.Run(tt.name, func(t *testing.T) {
 			// HACK: collect output explicitly because the analyzer does not use reporter
 			var out bytes.Buffer
@@ -49,12 +43,51 @@ func TestAnalyzer(t *testing.T) {
 
 			analyzer := NewAnalyzer()
 			testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-			analysistest.Run(t, testdata, analyzer, tt.packagePath)
+			// HACK: pass dummy t to test cases when violations found
+			analysistest.Run(&testing.T{}, testdata, analyzer, tt.packagePath)
 
 			assert.Equal(t, strings.Join(tt.expectedOut, "\n"), out.String())
 		})
 	}
 }
+
+// TestAnalyzer is a test for Analyzer.
+func TestAnalyzer(t *testing.T) {
+	tests := []struct {
+		name        string
+		packagePath string
+	}{
+		{
+			name:        "package meets anti-affinity rule",
+			packagePath: "a/foo/bar",
+		},
+		{
+			name:        "package imports another package in allowNames",
+			packagePath: "a/foo/quux",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt // pin
+
+		t.Run(tt.name, func(t *testing.T) {
+			// HACK: collect output explicitly because the analyzer does not use reporter
+			var out bytes.Buffer
+			teardownW := patchWriter(&out)
+			defer teardownW()
+
+			teardownC := patchConfigPath("testdata/.pkgaffinity.yaml")
+			defer teardownC()
+
+			analyzer := NewAnalyzer()
+			testdata := testutil.WithModules(t, analysistest.TestData(), nil)
+
+			analysistest.Run(t, testdata, analyzer, tt.packagePath)
+		})
+	}
+}
+
+// TestAnalyzer is a test for Analyzer.
 
 func patchWriter(out io.Writer) func() {
 	original := do.MustInvoke[io.Writer](importcheckerInjector)

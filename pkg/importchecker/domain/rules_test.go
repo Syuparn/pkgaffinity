@@ -9,15 +9,17 @@ import (
 
 func TestNewAntiAffinityGroupRule(t *testing.T) {
 	tests := []struct {
-		name     string
-		self     Path
-		group    PathPrefix
-		expected *AntiAffinityGroupRule
+		name       string
+		self       Path
+		group      PathPrefix
+		allowNames []Name
+		expected   *AntiAffinityGroupRule
 	}{
 		{
-			name:  "self is directly under selfPath",
-			self:  "foo/bar/baz",
-			group: "foo/bar",
+			name:       "self is directly under selfPath",
+			self:       "foo/bar/baz",
+			group:      "foo/bar",
+			allowNames: []Name{},
 			expected: &AntiAffinityGroupRule{
 				selfPath:        "foo/bar/baz",
 				groupPathPrefix: "foo/bar",
@@ -25,20 +27,32 @@ func TestNewAntiAffinityGroupRule(t *testing.T) {
 			},
 		},
 		{
-			name:  "self is not directly under selfPath",
-			self:  "foo/bar/baz/quux",
-			group: "foo/bar",
+			name:       "self is not directly under selfPath",
+			self:       "foo/bar/baz/quux",
+			group:      "foo/bar",
+			allowNames: []Name{},
 			expected: &AntiAffinityGroupRule{
 				selfPath:        "foo/bar/baz/quux",
 				groupPathPrefix: "foo/bar",
 				allowNames:      []Name{"baz"},
 			},
 		},
+		{
+			name:       "with allowNames",
+			self:       "foo/bar/baz/quux",
+			group:      "foo/bar",
+			allowNames: []Name{"hoge", "fuga"},
+			expected: &AntiAffinityGroupRule{
+				selfPath:        "foo/bar/baz/quux",
+				groupPathPrefix: "foo/bar",
+				allowNames:      []Name{"hoge", "fuga", "baz"},
+			},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual, err := NewAntiAffinityGroupRule(tt.self, tt.group)
+			actual, err := NewAntiAffinityGroupRule(tt.self, tt.group, tt.allowNames)
 			assert.Equal(t, tt.expected, actual)
 			assert.NoError(t, err)
 		})
@@ -47,34 +61,38 @@ func TestNewAntiAffinityGroupRule(t *testing.T) {
 
 func TestNewAntiAffinityGroupRuleError(t *testing.T) {
 	tests := []struct {
-		name     string
-		self     Path
-		group    PathPrefix
-		expected string
+		name       string
+		self       Path
+		group      PathPrefix
+		allowNames []Name
+		expected   string
 	}{
 		{
-			name:     "self is not in group",
-			self:     "hoge/fuga",
-			group:    "foo/bar",
-			expected: "self `hoge/fuga` must be in group `foo/bar`",
+			name:       "self is not in group",
+			self:       "hoge/fuga",
+			group:      "foo/bar",
+			allowNames: []Name{},
+			expected:   "self `hoge/fuga` must be in group `foo/bar`",
 		},
 		{
-			name:     "self is same as group",
-			self:     "foo/bar",
-			group:    "foo/bar",
-			expected: "self `foo/bar` must be in group `foo/bar`",
+			name:       "self is same as group",
+			self:       "foo/bar",
+			group:      "foo/bar",
+			allowNames: []Name{},
+			expected:   "self `foo/bar` must be in group `foo/bar`",
 		},
 		{
-			name:     "self has literally group prefix but refers different path",
-			self:     "foo/barbara",
-			group:    "foo/bar",
-			expected: "self `foo/barbara` must be in group `foo/bar`",
+			name:       "self has literally group prefix but refers different path",
+			self:       "foo/barbara",
+			group:      "foo/bar",
+			allowNames: []Name{},
+			expected:   "self `foo/barbara` must be in group `foo/bar`",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewAntiAffinityGroupRule(tt.self, tt.group)
+			_, err := NewAntiAffinityGroupRule(tt.self, tt.group, tt.allowNames)
 			assert.Error(t, err)
 			assert.EqualError(t, err, tt.expected)
 		})
@@ -92,6 +110,7 @@ func TestAntiAffinityGroupRuleCheckOK(t *testing.T) {
 			rule: lo.Must(NewAntiAffinityGroupRule(
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
+				[]Name{},
 			)),
 			path: "foo/bar/baz/hoge",
 		},
@@ -100,6 +119,7 @@ func TestAntiAffinityGroupRuleCheckOK(t *testing.T) {
 			rule: lo.Must(NewAntiAffinityGroupRule(
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
+				[]Name{},
 			)),
 			path: "fuga/piyo",
 		},
@@ -108,8 +128,18 @@ func TestAntiAffinityGroupRuleCheckOK(t *testing.T) {
 			rule: lo.Must(NewAntiAffinityGroupRule(
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
+				[]Name{},
 			)),
 			path: "foo/bar",
+		},
+		{
+			name: "path is not in selfPathPrefix but in allowNames",
+			rule: lo.Must(NewAntiAffinityGroupRule(
+				Path("foo/bar/baz/quux"),
+				PathPrefix("foo/bar"),
+				[]Name{"hoge"},
+			)),
+			path: "foo/bar/hoge/piyo",
 		},
 	}
 
@@ -133,6 +163,7 @@ func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 			rule: lo.Must(NewAntiAffinityGroupRule(
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
+				[]Name{},
 			)),
 			path: "foo/bar/hoge/piyo",
 			expected: &Violation{
@@ -146,6 +177,7 @@ func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 			rule: lo.Must(NewAntiAffinityGroupRule(
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
+				[]Name{},
 			)),
 			path: "foo/bar/hoge",
 			expected: &Violation{
@@ -159,6 +191,7 @@ func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 			rule: lo.Must(NewAntiAffinityGroupRule(
 				Path("foo/bar/baz/quux"),
 				PathPrefix("foo/bar"),
+				[]Name{},
 			)),
 			path: "foo/bar/baz123",
 			expected: &Violation{

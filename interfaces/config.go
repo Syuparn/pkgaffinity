@@ -16,4 +16,5 @@ type ListRulesByPathResponse struct {
 
 type AntiAffinityGroupRule struct {
 	GroupPathPrefix string
+	AllowNames      []string
 }

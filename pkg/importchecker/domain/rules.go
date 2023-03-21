@@ -40,7 +40,7 @@ type AntiAffinityGroupRule struct {
 // impl check
 var _ AntiAffinityRule = &AntiAffinityGroupRule{}
 
-func NewAntiAffinityGroupRule(self Path, group PathPrefix) (*AntiAffinityGroupRule, error) {
+func NewAntiAffinityGroupRule(self Path, group PathPrefix, allowNames []Name) (*AntiAffinityGroupRule, error) {
 	// NOTE: strings.HasPrefix(string(self), string(group)) is insufficient!
 	// ex1. different path but has same prefix:
 	//     self == `foo/barbara`, group == `foo/bar` (invalid)
@@ -56,10 +56,11 @@ func NewAntiAffinityGroupRule(self Path, group PathPrefix) (*AntiAffinityGroupRu
 	return &AntiAffinityGroupRule{
 		selfPath:        self,
 		groupPathPrefix: group,
-		allowNames: []Name{
+		allowNames: append(
+			allowNames,
 			// group rule allows path which belongs to same package prefix as selfPath
 			Name(relativeSelfElems[0]),
-		},
+		),
 	}, nil
 }
 

@@ -26,7 +26,7 @@ func TestCheckImportsInputPortExec(t *testing.T) {
 				},
 			},
 			mockRules: []domain.AntiAffinityRule{
-				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar")),
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{})),
 			},
 			expected: &CheckImportsOutputData{
 				Violations: []*domain.Violation{
@@ -48,8 +48,8 @@ func TestCheckImportsInputPortExec(t *testing.T) {
 				},
 			},
 			mockRules: []domain.AntiAffinityRule{
-				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar")),
-				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo")),
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{})),
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo", []domain.Name{})),
 			},
 			expected: &CheckImportsOutputData{
 				Violations: []*domain.Violation{

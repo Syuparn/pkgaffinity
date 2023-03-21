@@ -26,7 +26,7 @@ func TestAntiAffinityRuleRepositoryListByPath(t *testing.T) {
 				},
 			},
 			expected: []domain.AntiAffinityRule{
-				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar")),
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{})),
 			},
 		},
 		{
@@ -39,8 +39,20 @@ func TestAntiAffinityRuleRepositoryListByPath(t *testing.T) {
 				},
 			},
 			expected: []domain.AntiAffinityRule{
-				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar")),
-				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar/baz")),
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{})),
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar/baz", []domain.Name{})),
+			},
+		},
+		{
+			name:        "get one group rule with allowNames",
+			packagePath: "foo/bar/baz/hoge",
+			mockResponse: &interfaces.ListRulesByPathResponse{
+				AntiAffinityGroupRules: []*interfaces.AntiAffinityGroupRule{
+					{GroupPathPrefix: "foo/bar", AllowNames: []string{"fuga", "piyo"}},
+				},
+			},
+			expected: []domain.AntiAffinityRule{
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{"fuga", "piyo"})),
 			},
 		},
 		// TODO: list rules

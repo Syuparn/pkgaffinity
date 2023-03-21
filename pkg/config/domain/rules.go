@@ -6,9 +6,11 @@ import (
 
 type Path string
 type PathPrefix string
+type Name string
 
 type AntiAffinityGroupRule struct {
-	Group PathPrefix
+	Group      PathPrefix
+	AllowNames []Name
 }
 
 func (r *AntiAffinityGroupRule) Contains(path Path) bool {

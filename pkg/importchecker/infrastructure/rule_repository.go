@@ -3,6 +3,8 @@ package infrastructure
 import (
 	"fmt"
 
+	"github.com/samber/lo"
+
 	"github.com/syuparn/pkgaffinity/interfaces"
 	"github.com/syuparn/pkgaffinity/pkg/importchecker/domain"
 )
@@ -30,7 +32,11 @@ func (r *antiAffinityRuleRepository) ListByPath(packagePath domain.Path) ([]doma
 
 	groupRules := make([]domain.AntiAffinityRule, len(res.AntiAffinityGroupRules))
 	for i, gr := range res.AntiAffinityGroupRules {
-		rule, err := domain.NewAntiAffinityGroupRule(packagePath, domain.PathPrefix(gr.GroupPathPrefix))
+		rule, err := domain.NewAntiAffinityGroupRule(
+			packagePath,
+			domain.PathPrefix(gr.GroupPathPrefix),
+			lo.Map(gr.AllowNames, func(n string, _ int) domain.Name { return domain.Name(n) }),
+		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse group anti affinity rule %+v (package %s): %w", gr, packagePath, err)
 		}

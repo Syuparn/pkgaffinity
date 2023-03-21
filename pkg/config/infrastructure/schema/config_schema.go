@@ -12,5 +12,6 @@ type AntiAffinityRules struct {
 }
 
 type AntiAffinityGroupRule struct {
-	PathPrefix string `yaml:"pathPrefix"`
+	PathPrefix string   `yaml:"pathPrefix"`
+	AllowNames []string `yaml:"allowNames"`
 }

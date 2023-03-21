@@ -19,7 +19,7 @@ func TestAntiAffinityGroupRuleRepositoryFactoryCreate(t *testing.T) {
 			fileName: "one_group",
 			expected: &antiAffinityGroupRuleRepository{
 				rules: []*domain.AntiAffinityGroupRule{
-					{Group: "foo/bar"},
+					{Group: "foo/bar", AllowNames: []domain.Name{}},
 				},
 			},
 		},
@@ -28,8 +28,8 @@ func TestAntiAffinityGroupRuleRepositoryFactoryCreate(t *testing.T) {
 			fileName: "two_groups",
 			expected: &antiAffinityGroupRuleRepository{
 				rules: []*domain.AntiAffinityGroupRule{
-					{Group: "foo/bar"},
-					{Group: "baz"},
+					{Group: "foo/bar", AllowNames: []domain.Name{}},
+					{Group: "baz", AllowNames: []domain.Name{}},
 				},
 			},
 		},
@@ -38,6 +38,15 @@ func TestAntiAffinityGroupRuleRepositoryFactoryCreate(t *testing.T) {
 			fileName: "no_groups",
 			expected: &antiAffinityGroupRuleRepository{
 				rules: []*domain.AntiAffinityGroupRule{},
+			},
+		},
+		{
+			name:     "anti-affinity group rule with allow names",
+			fileName: "group_allow_names",
+			expected: &antiAffinityGroupRuleRepository{
+				rules: []*domain.AntiAffinityGroupRule{
+					{Group: "foo/bar", AllowNames: []domain.Name{"baz", "quux"}},
+				},
 			},
 		},
 	}

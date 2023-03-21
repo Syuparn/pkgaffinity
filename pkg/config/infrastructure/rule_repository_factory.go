@@ -44,6 +44,9 @@ func (f *antiAffinityGroupRuleRepositoryFactory) Create() (domain.AntiAffinityGr
 	rules := lo.Map(cfg.AntiAffinityRules.Groups, func(g *schema.AntiAffinityGroupRule, _ int) *domain.AntiAffinityGroupRule {
 		return &domain.AntiAffinityGroupRule{
 			Group: domain.PathPrefix(g.PathPrefix),
+			AllowNames: lo.Map(g.AllowNames, func(n string, _ int) domain.Name {
+				return domain.Name(n)
+			}),
 		}
 	})
 

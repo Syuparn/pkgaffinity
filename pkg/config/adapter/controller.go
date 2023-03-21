@@ -36,6 +36,9 @@ func (c *controller) ListRulesByPath(req *interfaces.ListRulesByPathRequest) (*i
 	groupRules := lo.Map(out.AntiAffinityGroupRules, func(r *domain.AntiAffinityGroupRule, _ int) *interfaces.AntiAffinityGroupRule {
 		return &interfaces.AntiAffinityGroupRule{
 			GroupPathPrefix: string(r.Group),
+			AllowNames: lo.Map(r.AllowNames, func(n domain.Name, _ int) string {
+				return string(n)
+			}),
 		}
 	})
 
