@@ -1,0 +1,4 @@
+version: v1alpha1
+antiAffinityRules:
+  groups:
+    - pathPrefix: a/foo

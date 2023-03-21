@@ -1,6 +1,7 @@
 package di
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -13,9 +14,7 @@ import (
 	"github.com/syuparn/pkgaffinity/pkg/importchecker/usecase"
 )
 
-func NewInjector(
-	configController interfaces.Config,
-) *do.Injector {
+func NewInjector() *do.Injector {
 	injector := do.New()
 
 	// settings
@@ -23,7 +22,7 @@ func NewInjector(
 		return os.Stdout, nil
 	})
 	do.Provide(injector, func(i *do.Injector) (interfaces.Config, error) {
-		return configController, nil
+		return nil, fmt.Errorf("DI for interfaces.Config must be overridden")
 	})
 	// domain
 	do.Provide(injector, func(i *do.Injector) (domain.AntiAffinityRuleRepository, error) {

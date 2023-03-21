@@ -6,4 +6,4 @@ import (
 	"github.com/syuparn/pkgaffinity"
 )
 
-func main() { singlechecker.Main(pkgaffinity.Analyzer) }
+func main() { singlechecker.Main(pkgaffinity.NewAnalyzer()) }
