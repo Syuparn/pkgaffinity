@@ -33,7 +33,7 @@ type checkImportsInteractor struct {
 // check impl
 var _ CheckImportsInputPort = &checkImportsInteractor{}
 
-func NewCheckImportsOutputPort(
+func NewCheckImportsInputPort(
 	presenter CheckImportsOutputPort,
 	antiAffinityRuleRepository domain.AntiAffinityRuleRepository,
 ) CheckImportsInputPort {

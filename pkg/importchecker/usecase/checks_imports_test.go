@@ -82,7 +82,7 @@ func TestCheckImportsInputPortExec(t *testing.T) {
 					return tt.mockRules, nil
 				},
 			}
-			interactor := NewCheckImportsOutputPort(presenterMock, antiAffinityRuleRepositoryMock)
+			interactor := NewCheckImportsInputPort(presenterMock, antiAffinityRuleRepositoryMock)
 
 			err := interactor.Exec(tt.in)
 
