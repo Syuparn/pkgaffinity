@@ -1,9 +1,12 @@
 package di
 
 import (
+	"os"
+
 	"github.com/samber/do"
 
 	"github.com/syuparn/pkgaffinity/interfaces"
+	"github.com/syuparn/pkgaffinity/interfaces/consts"
 	"github.com/syuparn/pkgaffinity/pkg/config/adapter"
 	"github.com/syuparn/pkgaffinity/pkg/config/domain"
 	"github.com/syuparn/pkgaffinity/pkg/config/infrastructure"
@@ -15,8 +18,13 @@ func NewInjector() *do.Injector {
 
 	// settings
 	do.Provide(injector, func(i *do.Injector) (string, error) {
-		// default config file path
-		return ".pkgaffinity.yaml", nil
+		filePath := os.Getenv(consts.ConfigFilePathEnvKey)
+		if filePath == "" {
+			// default config file path
+			return ".pkgaffinity.yaml", nil
+		}
+
+		return filePath, nil
 	})
 	// domain
 	do.Provide(injector, func(i *do.Injector) (infrastructure.AntiAffinityGroupRuleRepositoryFactory, error) {

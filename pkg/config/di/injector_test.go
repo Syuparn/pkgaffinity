@@ -12,9 +12,7 @@ func TestNewInjector(t *testing.T) {
 	injector := NewInjector()
 
 	// HACK: override config file path to right one
-	do.Override(injector, func(i *do.Injector) (string, error) {
-		return "testdata/.pkgaffinity.yaml", nil
-	})
+	t.Setenv("PKGAFFINITY_CONFIG_PATH", "testdata/.pkgaffinity.yaml")
 
 	controller, err := do.Invoke[interfaces.Config](injector)
 
