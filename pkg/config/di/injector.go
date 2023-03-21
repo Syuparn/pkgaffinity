@@ -35,10 +35,19 @@ func NewInjector() *do.Injector {
 		factory := do.MustInvoke[infrastructure.AntiAffinityGroupRuleRepositoryFactory](i)
 		return factory.Create()
 	})
+	do.Provide(injector, func(i *do.Injector) (infrastructure.AntiAffinityListRuleRepositoryFactory, error) {
+		configFilePath := do.MustInvoke[string](i)
+		return infrastructure.NewAntiAffinityListRuleRepositoryFactory(configFilePath), nil
+	})
+	do.Provide(injector, func(i *do.Injector) (domain.AntiAffinityListRuleRepository, error) {
+		factory := do.MustInvoke[infrastructure.AntiAffinityListRuleRepositoryFactory](i)
+		return factory.Create()
+	})
 	// usecase
 	do.Provide(injector, func(i *do.Injector) (usecase.ListByPathInputPort, error) {
 		groupRuleRepository := do.MustInvoke[domain.AntiAffinityGroupRuleRepository](i)
-		return usecase.NewListByPathInputPort(groupRuleRepository), nil
+		listRuleRepository := do.MustInvoke[domain.AntiAffinityListRuleRepository](i)
+		return usecase.NewListByPathInputPort(groupRuleRepository, listRuleRepository), nil
 	})
 	// adapter
 	do.Provide(injector, func(i *do.Injector) (interfaces.Config, error) {

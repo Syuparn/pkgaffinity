@@ -169,7 +169,7 @@ func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 			expected: &Violation{
 				ImportPath:  "foo/bar/hoge/piyo",
 				PackagePath: "foo/bar/baz/quux",
-				RuleName:    "anti-affinity group rule `foo/bar`",
+				RuleLabel:   "anti-affinity group rule `foo/bar`",
 			},
 		},
 		{
@@ -183,7 +183,7 @@ func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 			expected: &Violation{
 				ImportPath:  "foo/bar/hoge",
 				PackagePath: "foo/bar/baz/quux",
-				RuleName:    "anti-affinity group rule `foo/bar`",
+				RuleLabel:   "anti-affinity group rule `foo/bar`",
 			},
 		},
 		{
@@ -197,7 +197,152 @@ func TestAntiAffinityGroupRuleCheckNG(t *testing.T) {
 			expected: &Violation{
 				ImportPath:  "foo/bar/baz123",
 				PackagePath: "foo/bar/baz/quux",
-				RuleName:    "anti-affinity group rule `foo/bar`",
+				RuleLabel:   "anti-affinity group rule `foo/bar`",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violation := tt.rule.Check(tt.path)
+			assert.NotNil(t, violation)
+			assert.Equal(t, violation, tt.expected)
+		})
+	}
+}
+
+func TestNewAntiAffinityListRule(t *testing.T) {
+	tests := []struct {
+		name     string
+		label    RuleLabel
+		self     Path
+		prefixes []PathPrefix
+		expected *AntiAffinityListRule
+	}{
+		{
+			name:  "self is under a prefix",
+			label: "rule1",
+			self:  "foo/bar/baz/hoge",
+			prefixes: []PathPrefix{
+				"foo/bar",
+				"fuga/piyo",
+			},
+			expected: &AntiAffinityListRule{
+				selfPath: "foo/bar/baz/hoge",
+				pathPrefixes: []PathPrefix{
+					"fuga/piyo",
+					// "foo/bar" is removed because this is where selfPath belongs to
+				},
+				label: "rule1",
+			},
+		},
+		{
+			name:  "self is same as a prefix",
+			label: "rule1",
+			self:  "foo/bar",
+			prefixes: []PathPrefix{
+				"foo/bar",
+				"fuga/piyo",
+			},
+			expected: &AntiAffinityListRule{
+				selfPath: "foo/bar",
+				pathPrefixes: []PathPrefix{
+					"fuga/piyo",
+					// "foo/bar" is removed because this is where selfPath belongs to
+				},
+				label: "rule1",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual, err := NewAntiAffinityListRule(tt.self, tt.prefixes, tt.label)
+			assert.Equal(t, tt.expected, actual)
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func TestAntiAffinityListRuleCheckOK(t *testing.T) {
+	tests := []struct {
+		name string
+		rule *AntiAffinityListRule
+		path Path
+	}{
+		{
+			name: "path does not match to any prefixes",
+			rule: lo.Must(NewAntiAffinityListRule(
+				Path("foo/bar/baz/quux"),
+				[]PathPrefix{
+					"foo/bar",
+					"fuga/piyo",
+				},
+				"rule1",
+			)),
+			path: "quux",
+		},
+		{
+			name: "path matches a prefix but the prefix contains selfPath",
+			rule: lo.Must(NewAntiAffinityListRule(
+				Path("foo/bar/baz/quux"),
+				[]PathPrefix{
+					"foo/bar",
+					"fuga/piyo",
+				},
+				"rule1",
+			)),
+			path: "foo/bar/quux",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			violation := tt.rule.Check(tt.path)
+			assert.Nil(t, violation)
+		})
+	}
+}
+
+func TestAntiAffinityListRuleCheckNG(t *testing.T) {
+	tests := []struct {
+		name     string
+		rule     *AntiAffinityListRule
+		path     Path
+		expected *Violation
+	}{
+		{
+			name: "path matches to a prefix",
+			rule: lo.Must(NewAntiAffinityListRule(
+				Path("foo/bar/baz/quux"),
+				[]PathPrefix{
+					"foo/bar",
+					"fuga/piyo",
+				},
+				"rule1",
+			)),
+			path: "fuga/piyo/hoge",
+			expected: &Violation{
+				ImportPath:  "fuga/piyo/hoge",
+				PackagePath: "foo/bar/baz/quux",
+				RuleLabel:   "rule1",
+			},
+		},
+		{
+			name: "path matches to a prefix (path is same as the prefix)",
+			rule: lo.Must(NewAntiAffinityListRule(
+				Path("foo/bar/baz/quux"),
+				[]PathPrefix{
+					"foo/bar",
+					"fuga/piyo",
+				},
+				"rule1",
+			)),
+			path: "fuga/piyo",
+			expected: &Violation{
+				ImportPath:  "fuga/piyo",
+				PackagePath: "foo/bar/baz/quux",
+				RuleLabel:   "rule1",
 			},
 		},
 	}

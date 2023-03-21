@@ -42,7 +42,17 @@ func (c *controller) ListRulesByPath(req *interfaces.ListRulesByPathRequest) (*i
 		}
 	})
 
+	listRules := lo.Map(out.AntiAffinityListRules, func(r *domain.AntiAffinityListRule, _ int) *interfaces.AntiAffinityListRule {
+		return &interfaces.AntiAffinityListRule{
+			Label: string(r.Label),
+			PathPrefixes: lo.Map(r.Prefixes, func(p domain.PathPrefix, _ int) string {
+				return string(p)
+			}),
+		}
+	})
+
 	return &interfaces.ListRulesByPathResponse{
 		AntiAffinityGroupRules: groupRules,
+		AntiAffinityListRules:  listRules,
 	}, nil
 }

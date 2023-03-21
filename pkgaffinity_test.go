@@ -24,6 +24,7 @@ func TestAnalyzerViolation(t *testing.T) {
 			packagePath: "a/foo/baz",
 			expectedOut: []string{
 				"package a/foo/baz: import \"a/foo/bar\" breaks anti-affinity group rule `a/foo`",
+				"package a/foo/baz: import \"a/other/hoge\" breaks listrule1",
 				"", // break line
 			},
 		},

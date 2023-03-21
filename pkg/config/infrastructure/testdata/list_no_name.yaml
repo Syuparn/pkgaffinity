@@ -1,0 +1,7 @@
+version: v1alpha1
+antiAffinityRules:
+  lists:
+    # no labels
+    - pathPrefixes:
+        - foo/bar
+        - baz/quux

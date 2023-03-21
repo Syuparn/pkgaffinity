@@ -11,10 +11,15 @@ type ListRulesByPathRequest struct {
 
 type ListRulesByPathResponse struct {
 	AntiAffinityGroupRules []*AntiAffinityGroupRule
-	// TODO: AntiAffinityListRule
+	AntiAffinityListRules  []*AntiAffinityListRule
 }
 
 type AntiAffinityGroupRule struct {
 	GroupPathPrefix string
 	AllowNames      []string
+}
+
+type AntiAffinityListRule struct {
+	Label        string
+	PathPrefixes []string
 }

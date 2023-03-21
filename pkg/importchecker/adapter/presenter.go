@@ -26,7 +26,7 @@ func NewCheckImportsOutputPort(
 
 func (p *checkImportsPresenter) Present(out *usecase.CheckImportsOutputData) error {
 	lo.ForEach(out.Violations, func(v *domain.Violation, _ int) {
-		fmt.Fprintf(p.writer, "package %s: import \"%s\" breaks %s\n", v.PackagePath, v.ImportPath, v.RuleName)
+		fmt.Fprintf(p.writer, "package %s: import \"%s\" breaks %s\n", v.PackagePath, v.ImportPath, v.RuleLabel)
 	})
 
 	if len(out.Violations) != 0 {
