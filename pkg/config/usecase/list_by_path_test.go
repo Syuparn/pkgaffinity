@@ -12,10 +12,11 @@ func TestListByPathInputPortExec(t *testing.T) {
 		name           string
 		in             *ListByPathInputData
 		mockGroupRules []*domain.AntiAffinityGroupRule
+		mockListRules  []*domain.AntiAffinityListRule
 		expected       *ListByPathOutputData
 	}{
 		{
-			name: "list group rules",
+			name: "list rules",
 			in: &ListByPathInputData{
 				PackagePath: "foo/bar/baz/hoge",
 			},
@@ -23,10 +24,16 @@ func TestListByPathInputPortExec(t *testing.T) {
 				{Group: "foo/bar"},
 				{Group: "foo/bar/baz"},
 			},
+			mockListRules: []*domain.AntiAffinityListRule{
+				{Label: "listrule1", Prefixes: []domain.PathPrefix{"hoge/fuga", "piyo"}},
+			},
 			expected: &ListByPathOutputData{
 				AntiAffinityGroupRules: []*domain.AntiAffinityGroupRule{
 					{Group: "foo/bar"},
 					{Group: "foo/bar/baz"},
+				},
+				AntiAffinityListRules: []*domain.AntiAffinityListRule{
+					{Label: "listrule1", Prefixes: []domain.PathPrefix{"hoge/fuga", "piyo"}},
 				},
 			},
 		},
@@ -39,7 +46,12 @@ func TestListByPathInputPortExec(t *testing.T) {
 					return tt.mockGroupRules, nil
 				},
 			}
-			interactor := NewListByPathInputPort(antiAffinityGroupRuleRepositoryMock)
+			antiAffinityListRuleRepositoryMock := &domain.AntiAffinityListRuleRepositoryMock{
+				ListByPathFunc: func(_ domain.Path) ([]*domain.AntiAffinityListRule, error) {
+					return tt.mockListRules, nil
+				},
+			}
+			interactor := NewListByPathInputPort(antiAffinityGroupRuleRepositoryMock, antiAffinityListRuleRepositoryMock)
 
 			actual, err := interactor.Exec(tt.in)
 

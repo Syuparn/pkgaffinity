@@ -72,3 +72,69 @@ func (mock *AntiAffinityGroupRuleRepositoryMock) ListByPathCalls() []struct {
 	mock.lockListByPath.RUnlock()
 	return calls
 }
+
+// Ensure, that AntiAffinityListRuleRepositoryMock does implement AntiAffinityListRuleRepository.
+// If this is not the case, regenerate this file with moq.
+var _ AntiAffinityListRuleRepository = &AntiAffinityListRuleRepositoryMock{}
+
+// AntiAffinityListRuleRepositoryMock is a mock implementation of AntiAffinityListRuleRepository.
+//
+//	func TestSomethingThatUsesAntiAffinityListRuleRepository(t *testing.T) {
+//
+//		// make and configure a mocked AntiAffinityListRuleRepository
+//		mockedAntiAffinityListRuleRepository := &AntiAffinityListRuleRepositoryMock{
+//			ListByPathFunc: func(path Path) ([]*AntiAffinityListRule, error) {
+//				panic("mock out the ListByPath method")
+//			},
+//		}
+//
+//		// use mockedAntiAffinityListRuleRepository in code that requires AntiAffinityListRuleRepository
+//		// and then make assertions.
+//
+//	}
+type AntiAffinityListRuleRepositoryMock struct {
+	// ListByPathFunc mocks the ListByPath method.
+	ListByPathFunc func(path Path) ([]*AntiAffinityListRule, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// ListByPath holds details about calls to the ListByPath method.
+		ListByPath []struct {
+			// Path is the path argument value.
+			Path Path
+		}
+	}
+	lockListByPath sync.RWMutex
+}
+
+// ListByPath calls ListByPathFunc.
+func (mock *AntiAffinityListRuleRepositoryMock) ListByPath(path Path) ([]*AntiAffinityListRule, error) {
+	if mock.ListByPathFunc == nil {
+		panic("AntiAffinityListRuleRepositoryMock.ListByPathFunc: method is nil but AntiAffinityListRuleRepository.ListByPath was just called")
+	}
+	callInfo := struct {
+		Path Path
+	}{
+		Path: path,
+	}
+	mock.lockListByPath.Lock()
+	mock.calls.ListByPath = append(mock.calls.ListByPath, callInfo)
+	mock.lockListByPath.Unlock()
+	return mock.ListByPathFunc(path)
+}
+
+// ListByPathCalls gets all the calls that were made to ListByPath.
+// Check the length with:
+//
+//	len(mockedAntiAffinityListRuleRepository.ListByPathCalls())
+func (mock *AntiAffinityListRuleRepositoryMock) ListByPathCalls() []struct {
+	Path Path
+} {
+	var calls []struct {
+		Path Path
+	}
+	mock.lockListByPath.RLock()
+	calls = mock.calls.ListByPath
+	mock.lockListByPath.RUnlock()
+	return calls
+}

@@ -23,12 +23,12 @@ func TestCheckImportsPresenterViolation(t *testing.T) {
 					{
 						ImportPath:  "foo/fuga",
 						PackagePath: "foo/bar/baz/hoge",
-						RuleName:    "anti-affinity group rule `foo`",
+						RuleLabel:   "anti-affinity group rule `foo`",
 					},
 					{
 						ImportPath:  "foo/bar/piyo",
 						PackagePath: "foo/bar/baz/hoge",
-						RuleName:    "anti-affinity group rule `foo/bar`",
+						RuleLabel:   "anti-affinity group rule `foo/bar`",
 					},
 				},
 			},

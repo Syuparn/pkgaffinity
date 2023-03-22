@@ -3,19 +3,17 @@ package domain
 import (
 	"fmt"
 	"strings"
+
+	"github.com/samber/lo"
 )
 
-type Path string
-type Name string
-type PathPrefix string
-
-type AntiAffinityRuleName string
+type RuleLabel string
 
 // Violation represents why affinity rule is not fulfilled.
 type Violation struct {
 	ImportPath  Path
 	PackagePath Path
-	RuleName    AntiAffinityRuleName
+	RuleLabel   RuleLabel
 }
 
 type AntiAffinityRule interface {
@@ -80,12 +78,55 @@ func (r *AntiAffinityGroupRule) Check(path Path) *Violation {
 	return &Violation{
 		ImportPath:  path,
 		PackagePath: r.selfPath,
-		RuleName:    r.name(),
+		RuleLabel:   r.label(),
 	}
 }
 
-func (r *AntiAffinityGroupRule) name() AntiAffinityRuleName {
-	return AntiAffinityRuleName(fmt.Sprintf("anti-affinity group rule `%s`", r.groupPathPrefix))
+func (r *AntiAffinityGroupRule) label() RuleLabel {
+	return RuleLabel(fmt.Sprintf("anti-affinity group rule `%s`", r.groupPathPrefix))
 }
 
-// TODO: make AntiAffinityListRule
+// AntiAffinityListRule defines import path anti-affinity list of a package.
+// any packages inside a path prefix cannot be imported.
+// (ex: when prefix `foo/bar` and `baz` are defined, `foo/bar/*` and `baz/*` cannot be imported)
+type AntiAffinityListRule struct {
+	// selfPath is the path of the package
+	// ex: `"foo/bar/baz/hoge"`
+	selfPath Path
+	// pathPrefix defines prefixes that selfPath cannot import
+	// ex: `[]string{"foo/bar/quux"}`
+	pathPrefixes []PathPrefix
+	// label is only used as metadata to distinguish rules
+	label RuleLabel
+}
+
+// impl check
+var _ AntiAffinityRule = &AntiAffinityListRule{}
+
+func NewAntiAffinityListRule(self Path, prefixes []PathPrefix, label RuleLabel) (*AntiAffinityListRule, error) {
+	// NOTE: remove prefixes which contain selfPath because they don't break anti-affinity
+	requiredPrefixes := lo.Reject(prefixes, func(p PathPrefix, _ int) bool {
+		return p.Contains(self)
+	})
+
+	rule := &AntiAffinityListRule{
+		selfPath:     self,
+		pathPrefixes: requiredPrefixes,
+		label:        label,
+	}
+	return rule, nil
+}
+
+func (r *AntiAffinityListRule) Check(path Path) *Violation {
+	for _, prefix := range r.pathPrefixes {
+		if prefix.Contains(path) {
+			return &Violation{
+				ImportPath:  path,
+				PackagePath: r.selfPath,
+				RuleLabel:   r.label,
+			}
+		}
+	}
+
+	return nil
+}

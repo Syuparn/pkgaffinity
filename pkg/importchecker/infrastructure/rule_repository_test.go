@@ -55,7 +55,36 @@ func TestAntiAffinityRuleRepositoryListByPath(t *testing.T) {
 				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{"fuga", "piyo"})),
 			},
 		},
-		// TODO: list rules
+		{
+			name:        "get two list rules",
+			packagePath: "foo/bar/baz/hoge",
+			mockResponse: &interfaces.ListRulesByPathResponse{
+				AntiAffinityListRules: []*interfaces.AntiAffinityListRule{
+					{Label: "rule1", PathPrefixes: []string{"foo/bar", "fuga/piyo"}},
+					{Label: "rule2", PathPrefixes: []string{"foo/bar/baz", "quux"}},
+				},
+			},
+			expected: []domain.AntiAffinityRule{
+				lo.Must(domain.NewAntiAffinityListRule("foo/bar/baz/hoge", []domain.PathPrefix{"foo/bar", "fuga/piyo"}, "rule1")),
+				lo.Must(domain.NewAntiAffinityListRule("foo/bar/baz/hoge", []domain.PathPrefix{"foo/bar/baz", "quux"}, "rule2")),
+			},
+		},
+		{
+			name:        "get a group rule and a list rule",
+			packagePath: "foo/bar/baz/hoge",
+			mockResponse: &interfaces.ListRulesByPathResponse{
+				AntiAffinityGroupRules: []*interfaces.AntiAffinityGroupRule{
+					{GroupPathPrefix: "foo/bar"},
+				},
+				AntiAffinityListRules: []*interfaces.AntiAffinityListRule{
+					{Label: "rule1", PathPrefixes: []string{"foo/bar", "fuga/piyo"}},
+				},
+			},
+			expected: []domain.AntiAffinityRule{
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{})),
+				lo.Must(domain.NewAntiAffinityListRule("foo/bar/baz/hoge", []domain.PathPrefix{"foo/bar", "fuga/piyo"}, "rule1")),
+			},
+		},
 	}
 
 	for _, tt := range tests {

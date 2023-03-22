@@ -16,3 +16,13 @@ antiAffinityRules:
     #     OK: package github.com/syuparn/pkgaffinity/pkg/config/* imports github.com/syuparn/pkgaffinity/pkg/foo/*
     - allowNames:
       - foo
+  # List rule defines anti-affinity rules that packages under a path prefix are not allowed to import packages under any other path prefixes.
+  # This keeps independence of each package prefix.
+  # ex:
+  #    NG: package github.com/syuparn/pkgaffinity/pkg/interfaces/* imports github.com/syuparn/pkgaffinity/pkg/hack/*
+  #    OK: package github.com/syuparn/pkgaffinity/pkg/interfaces/* imports github.com/syuparn/pkgaffinity/pkg/interfaces/*
+  lists:
+    - label: separate_tools_from_interface
+      pathPrefixes:
+        - github.com/syuparn/pkgaffinity/hack
+        - github.com/syuparn/pkgaffinity/interfaces

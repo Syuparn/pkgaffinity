@@ -1,0 +1,11 @@
+version: v1alpha1
+antiAffinityRules:
+  lists:
+    - label: rule1
+      pathPrefixes:
+        - foo/bar
+        - baz/quux
+    - label: rule2
+      pathPrefixes:
+        - hoge/fuga/piyo
+        - a/b

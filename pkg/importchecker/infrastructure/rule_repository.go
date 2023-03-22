@@ -43,5 +43,18 @@ func (r *antiAffinityRuleRepository) ListByPath(packagePath domain.Path) ([]doma
 		groupRules[i] = rule
 	}
 
-	return groupRules, nil
+	listRules := make([]domain.AntiAffinityRule, len(res.AntiAffinityListRules))
+	for i, lr := range res.AntiAffinityListRules {
+		rule, err := domain.NewAntiAffinityListRule(
+			packagePath,
+			lo.Map(lr.PathPrefixes, func(p string, _ int) domain.PathPrefix { return domain.PathPrefix(p) }),
+			domain.RuleLabel(lr.Label),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse list anti affinity rule %+v (package %s): %w", lr, packagePath, err)
+		}
+		listRules[i] = rule
+	}
+
+	return append(groupRules, listRules...), nil
 }

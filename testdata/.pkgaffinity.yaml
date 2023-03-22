@@ -4,3 +4,8 @@ antiAffinityRules:
     - pathPrefix: a/foo
       allowNames:
         - allowed
+  lists:
+    - label: listrule1
+      pathPrefixes:
+        - a/foo
+        - a/other

@@ -20,8 +20,30 @@ Any package in anti-affinity rule are not allowed to import any other package in
 
 #### Anti-Affinity List
 
-(under construction)
+Anti-affinity list forbids a package under a path prefix import packages under any other path prefixes.
 
+```
+# package tree
+- github.com/foo/bar
+  - baz
+    - quux
+  - pkg
+    - hoge
+      - fuga
+```
+
+```yaml
+version: v1alpha1
+antiAffinityRules:
+  lists:
+    - label: separate_hoge_and_baz
+      pathPrefixes:
+        - github.com/foo/bar/baz
+        - github.com/foo/bar/pkg/hoge
+```
+
+Each path prefix is treated as import boundary.
+Any import across the boundaries is forbidden (ex: import `github.com/foo/bar/baz/quux` from `github.com/foo/bar/pkg/hoge/fuga`).
 
 #### Anti-Affinity Group
 
