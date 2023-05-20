@@ -16,6 +16,11 @@ antiAffinityRules:
       #     OK: package github.com/syuparn/pkgaffinity/pkg/config/* imports github.com/syuparn/pkgaffinity/pkg/foo/*
       allowNames:
       - foo
+    # packages in ignorePaths are not checked and can break the anti-affinity rule.
+    # ex:
+    #     OK: package github.com/syuparn/pkgaffinity/pkg/bar/baz imports anything
+    - ignorePaths:
+      - bar/baz
   # List rule defines anti-affinity rules that packages under a path prefix are not allowed to import packages under any other path prefixes.
   # This keeps independence of each package prefix.
   # ex:

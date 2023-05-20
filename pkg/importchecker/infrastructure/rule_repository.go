@@ -30,8 +30,13 @@ func (r *antiAffinityRuleRepository) ListByPath(packagePath domain.Path) ([]doma
 		return nil, fmt.Errorf("failed to get rules from config: %w", err)
 	}
 
-	groupRules := make([]domain.AntiAffinityRule, len(res.AntiAffinityGroupRules))
-	for i, gr := range res.AntiAffinityGroupRules {
+	groupRules := []domain.AntiAffinityRule{}
+	for _, gr := range res.AntiAffinityGroupRules {
+		// skip rule if this package is in ignorePaths
+		if lo.Contains(gr.IgnorePaths, string(packagePath)) {
+			continue
+		}
+
 		rule, err := domain.NewAntiAffinityGroupRule(
 			packagePath,
 			domain.PathPrefix(gr.GroupPathPrefix),
@@ -40,7 +45,7 @@ func (r *antiAffinityRuleRepository) ListByPath(packagePath domain.Path) ([]doma
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse group anti affinity rule %+v (package %s): %w", gr, packagePath, err)
 		}
-		groupRules[i] = rule
+		groupRules = append(groupRules, rule)
 	}
 
 	listRules := make([]domain.AntiAffinityRule, len(res.AntiAffinityListRules))

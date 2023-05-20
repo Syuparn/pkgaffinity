@@ -4,6 +4,8 @@ antiAffinityRules:
     - pathPrefix: a/foo
       allowNames:
         - allowed
+      ignorePaths:
+        - baz/ignored
   lists:
     - label: listrule1
       pathPrefixes:

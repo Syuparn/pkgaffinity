@@ -19,7 +19,7 @@ func TestAntiAffinityGroupRuleRepositoryFactoryCreate(t *testing.T) {
 			fileName: "one_group",
 			expected: &antiAffinityGroupRuleRepository{
 				rules: []*domain.AntiAffinityGroupRule{
-					{Group: "foo/bar", AllowNames: []domain.Name{}},
+					{Group: "foo/bar", AllowNames: []domain.Name{}, IgnorePaths: []domain.Path{}},
 				},
 			},
 		},
@@ -28,8 +28,8 @@ func TestAntiAffinityGroupRuleRepositoryFactoryCreate(t *testing.T) {
 			fileName: "two_groups",
 			expected: &antiAffinityGroupRuleRepository{
 				rules: []*domain.AntiAffinityGroupRule{
-					{Group: "foo/bar", AllowNames: []domain.Name{}},
-					{Group: "baz", AllowNames: []domain.Name{}},
+					{Group: "foo/bar", AllowNames: []domain.Name{}, IgnorePaths: []domain.Path{}},
+					{Group: "baz", AllowNames: []domain.Name{}, IgnorePaths: []domain.Path{}},
 				},
 			},
 		},
@@ -45,7 +45,16 @@ func TestAntiAffinityGroupRuleRepositoryFactoryCreate(t *testing.T) {
 			fileName: "group_allow_names",
 			expected: &antiAffinityGroupRuleRepository{
 				rules: []*domain.AntiAffinityGroupRule{
-					{Group: "foo/bar", AllowNames: []domain.Name{"baz", "quux"}},
+					{Group: "foo/bar", AllowNames: []domain.Name{"baz", "quux"}, IgnorePaths: []domain.Path{}},
+				},
+			},
+		},
+		{
+			name:     "anti-affinity group rule with ignore paths",
+			fileName: "group_ignore_paths",
+			expected: &antiAffinityGroupRuleRepository{
+				rules: []*domain.AntiAffinityGroupRule{
+					{Group: "foo/bar", AllowNames: []domain.Name{}, IgnorePaths: []domain.Path{"foo/bar/baz/ignore1", "foo/bar/quux/ignore2"}},
 				},
 			},
 		},

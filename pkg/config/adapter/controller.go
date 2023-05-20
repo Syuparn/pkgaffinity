@@ -39,6 +39,9 @@ func (c *controller) ListRulesByPath(req *interfaces.ListRulesByPathRequest) (*i
 			AllowNames: lo.Map(r.AllowNames, func(n domain.Name, _ int) string {
 				return string(n)
 			}),
+			IgnorePaths: lo.Map(r.IgnorePaths, func(p domain.Path, _ int) string {
+				return string(p)
+			}),
 		}
 	})
 

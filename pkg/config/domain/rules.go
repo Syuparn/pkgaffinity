@@ -9,8 +9,9 @@ type PathPrefix string
 type Name string
 
 type AntiAffinityGroupRule struct {
-	Group      PathPrefix
-	AllowNames []Name
+	Group       PathPrefix
+	AllowNames  []Name
+	IgnorePaths []Path
 }
 
 func (r *AntiAffinityGroupRule) Contains(path Path) bool {

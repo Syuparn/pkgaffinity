@@ -12,8 +12,9 @@ type AntiAffinityRules struct {
 }
 
 type AntiAffinityGroupRule struct {
-	PathPrefix string   `yaml:"pathPrefix"`
-	AllowNames []string `yaml:"allowNames"`
+	PathPrefix  string   `yaml:"pathPrefix"`
+	AllowNames  []string `yaml:"allowNames"`
+	IgnorePaths []string `yaml:"ignorePaths"`
 }
 
 type AntiAffinityListRule struct {
