@@ -1,0 +1,7 @@
+version: v1alpha1
+antiAffinityRules:
+  groups:
+    - pathPrefix: foo/bar
+      ignorePaths:
+      - baz/ignore1
+      - quux/ignore2

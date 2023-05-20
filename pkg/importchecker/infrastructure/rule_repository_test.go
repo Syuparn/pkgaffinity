@@ -56,6 +56,28 @@ func TestAntiAffinityRuleRepositoryListByPath(t *testing.T) {
 			},
 		},
 		{
+			name:        "get one group rule with ignorePaths",
+			packagePath: "foo/bar/baz/hoge",
+			mockResponse: &interfaces.ListRulesByPathResponse{
+				AntiAffinityGroupRules: []*interfaces.AntiAffinityGroupRule{
+					{GroupPathPrefix: "foo/bar", IgnorePaths: []string{"foo/bar/baz/ignored", "foo/bar/baz/other"}},
+				},
+			},
+			expected: []domain.AntiAffinityRule{
+				lo.Must(domain.NewAntiAffinityGroupRule("foo/bar/baz/hoge", "foo/bar", []domain.Name{})),
+			},
+		},
+		{
+			name:        "get one group rule but matched to ignorePaths",
+			packagePath: "foo/bar/baz/hoge",
+			mockResponse: &interfaces.ListRulesByPathResponse{
+				AntiAffinityGroupRules: []*interfaces.AntiAffinityGroupRule{
+					{GroupPathPrefix: "foo/bar", IgnorePaths: []string{"foo/bar/baz/other", "foo/bar/baz/hoge"}},
+				},
+			},
+			expected: []domain.AntiAffinityRule{},
+		},
+		{
 			name:        "get two list rules",
 			packagePath: "foo/bar/baz/hoge",
 			mockResponse: &interfaces.ListRulesByPathResponse{

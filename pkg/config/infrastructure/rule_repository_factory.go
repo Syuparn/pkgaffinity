@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/samber/lo"
 	"github.com/syuparn/pkgaffinity/pkg/config/domain"
@@ -46,6 +47,9 @@ func (f *antiAffinityGroupRuleRepositoryFactory) Create() (domain.AntiAffinityGr
 			Group: domain.PathPrefix(g.PathPrefix),
 			AllowNames: lo.Map(g.AllowNames, func(n string, _ int) domain.Name {
 				return domain.Name(n)
+			}),
+			IgnorePaths: lo.Map(g.IgnorePaths, func(p string, _ int) domain.Path {
+				return domain.Path(path.Join(g.PathPrefix, p))
 			}),
 		}
 	})

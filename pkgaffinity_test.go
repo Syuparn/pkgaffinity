@@ -66,17 +66,16 @@ func TestAnalyzer(t *testing.T) {
 			name:        "package imports another package in allowNames",
 			packagePath: "a/foo/quux",
 		},
+		{
+			name:        "package in ignorePaths",
+			packagePath: "a/foo/baz/ignored",
+		},
 	}
 
 	for _, tt := range tests {
 		tt := tt // pin
 
 		t.Run(tt.name, func(t *testing.T) {
-			// HACK: collect output explicitly because the analyzer does not use reporter
-			var out bytes.Buffer
-			teardownW := patchWriter(&out)
-			defer teardownW()
-
 			teardownC := patchConfigPath("testdata/.pkgaffinity.yaml")
 			defer teardownC()
 
