@@ -6,6 +6,33 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewPath(t *testing.T) {
+	tests := []struct {
+		name     string
+		path     string
+		expected Path
+	}{
+		{
+			name:     "create a path",
+			path:     "foo/bar",
+			expected: Path("foo/bar"),
+		},
+		{
+			name:     "suffix .test is ignored",
+			path:     "foo/bar.test",
+			expected: Path("foo/bar"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := NewPath(tt.path)
+
+			assert.Equal(t, tt.expected, actual)
+		})
+	}
+}
+
 func TestPathPrefixContains(t *testing.T) {
 	tests := []struct {
 		name     string

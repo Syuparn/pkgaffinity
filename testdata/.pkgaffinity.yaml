@@ -6,6 +6,8 @@ antiAffinityRules:
         - allowed
       ignorePaths:
         - baz/ignored
+    # test for main.test package
+    - pathPrefix: a/cmd
   lists:
     - label: listrule1
       pathPrefixes:

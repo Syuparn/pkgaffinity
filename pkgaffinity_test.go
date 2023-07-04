@@ -70,6 +70,10 @@ func TestAnalyzer(t *testing.T) {
 			name:        "package in ignorePaths",
 			packagePath: "a/foo/baz/ignored",
 		},
+		{
+			name:        "main and main.test are treated as the same package",
+			packagePath: "a/cmd/a",
+		},
 	}
 
 	for _, tt := range tests {
