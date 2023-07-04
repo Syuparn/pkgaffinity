@@ -44,7 +44,7 @@ func NewCheckImportsInputPort(
 }
 
 func (it *checkImportsInteractor) Exec(in *CheckImportsInputData) error {
-	packagePath := domain.Path(in.PackagePath)
+	packagePath := domain.NewPath(in.PackagePath)
 	rules, err := it.antiAffinityRuleRepository.ListByPath(packagePath)
 	if err != nil {
 		return fmt.Errorf("failed to get anti affinity rules of package `%s`: %w", packagePath, err)
@@ -52,7 +52,7 @@ func (it *checkImportsInteractor) Exec(in *CheckImportsInputData) error {
 
 	violations := lo.FlatMap(in.ImportPaths, func(importPath string, _ int) []*domain.Violation {
 		return lo.Compact(lo.Map(rules, func(rule domain.AntiAffinityRule, _ int) *domain.Violation {
-			return rule.Check(domain.Path(importPath))
+			return rule.Check(domain.NewPath(importPath))
 		}))
 	})
 
